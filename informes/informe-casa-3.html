@@ -1,0 +1,213 @@
+<!doctype html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Casa 3 · Historial de Pagos</title>
+
+
+
+<style>
+  :root{
+    --ground:#eef2f4; --surface:#ffffff; --surface-2:#f6f9fa;
+    --ink:#14232c; --body:#33454f; --muted:#68808d;
+    --line:#d3dee3; --line-soft:#e4ecef;
+    --accent:#0d6a71; --accent-soft:#dceced;
+    --warn:#94451c; --warn-soft:#f4e5da;
+    --plum:#5b4a7a; --plum-soft:#e8e3f0;
+    --ok:#2c6a48; --ok-soft:#dcece2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d151a; --surface:#141f26; --surface-2:#18242c;
+      --ink:#e6eef1; --body:#c0d0d7; --muted:#8ba2ad;
+      --line:#26353e; --line-soft:#1d2b33;
+      --accent:#54b6b8; --accent-soft:#12333a;
+      --warn:#dd9366; --warn-soft:#332014;
+      --plum:#b3a1d4; --plum-soft:#241e33;
+      --ok:#78c39a; --ok-soft:#153025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d151a; --surface:#141f26; --surface-2:#18242c;
+    --ink:#e6eef1; --body:#c0d0d7; --muted:#8ba2ad;
+    --line:#26353e; --line-soft:#1d2b33;
+    --accent:#54b6b8; --accent-soft:#12333a;
+    --warn:#dd9366; --warn-soft:#332014;
+    --plum:#b3a1d4; --plum-soft:#241e33;
+    --ok:#78c39a; --ok-soft:#153025;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--body);
+    font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+    font-size:16.5px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:clamp(20px,4vw,52px) clamp(16px,4vw,40px) 72px; display:flex; flex-direction:column; gap:34px}
+
+  .head{display:flex; flex-direction:column; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:22px}
+  .eyebrow{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
+  h1{font-family:"Archivo",system-ui,sans-serif; font-weight:700; color:var(--ink); font-size:clamp(30px,5.2vw,46px); line-height:1.04; letter-spacing:-.022em; margin:0; text-wrap:balance}
+  h1 small{display:block; font-size:.42em; font-weight:500; letter-spacing:.01em; color:var(--muted); margin-top:10px; line-height:1.3}
+  .head-meta{display:flex; flex-wrap:wrap; gap:6px 22px; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px; color:var(--muted)}
+  .head-meta b{color:var(--body); font-weight:500}
+
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+  .tile{background:var(--surface); padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px}
+  .tile .k{font-family:"Archivo",system-ui,sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--muted)}
+  .tile .v{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:21px; font-weight:600; color:var(--ink); letter-spacing:-.02em}
+  .tile .n{font-size:13px; color:var(--muted); line-height:1.35}
+  .tile.flag .v{color:var(--warn)}
+  .tile.good .v{color:var(--ok)}
+
+  h2{font-family:"Archivo",system-ui,sans-serif; font-weight:600; color:var(--ink); font-size:13px; letter-spacing:.13em; text-transform:uppercase; margin:0 0 14px; display:flex; align-items:center; gap:12px}
+  h2::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .scroller{overflow-x:auto; border:1px solid var(--line); border-radius:3px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:860px; font-size:14px}
+  thead th{position:sticky; top:0; z-index:2; background:var(--surface-2); font-family:"Archivo",system-ui,sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); white-space:nowrap}
+  tbody td{padding:9px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+  tbody tr:hover td{background:var(--surface-2)}
+  tr.yr td{background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:12px; letter-spacing:.16em; color:var(--ink); padding:9px 14px}
+  tr.yr .sub{float:right; font-weight:500; letter-spacing:.04em; color:var(--muted); font-size:11.5px}
+  .num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; color:var(--ink); font-weight:500}
+  .date{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--body)}
+  .desc{font-size:13.5px; color:var(--body); min-width:230px}
+  .desc .acct{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px; color:var(--muted); display:block}
+  .casa{font-family:"IBM Plex Mono",ui-monospace,monospace; text-align:center; color:var(--muted)}
+  .nil{color:var(--muted); text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .obs{font-size:13.5px; min-width:220px}
+  .chip{display:inline-block; font-family:"Archivo",system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; padding:2px 7px; border-radius:2px; margin-right:7px; vertical-align:1px}
+  .chip.cuota{background:var(--accent-soft); color:var(--accent)}
+  .chip.tag{background:var(--plum-soft); color:var(--plum)}
+  .chip.asf{background:var(--warn-soft); color:var(--warn)}
+  /* Aportes extraordinarios: CSO, cuota extra 2023, cámaras 2016, lo que venga. */
+  .chip.otro{background:var(--surface-2); color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+  tfoot td{padding:12px 14px; border-top:2px solid var(--ink); font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink)}
+  tfoot td.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; letter-spacing:0}
+  .fn{font-size:12.5px; color:var(--muted); margin:9px 2px 0; line-height:1.5; max-width:78ch}
+  .fn b{color:var(--body); font-weight:600}
+
+  .analysis{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:3px; padding:24px clamp(18px,3vw,30px); display:flex; flex-direction:column; gap:14px}
+  .analysis p{margin:0; max-width:66ch}
+  .analysis p strong{color:var(--ink); font-weight:600}
+  .verdict{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; font-family:"Archivo",system-ui,sans-serif; font-size:13px; font-weight:600; color:var(--warn); background:var(--warn-soft); border-radius:3px; padding:11px 15px; letter-spacing:.01em}
+  .verdict.good{color:var(--ok); background:var(--ok-soft)}
+  .verdict span{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600}
+  footer{font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:16px; line-height:1.6; max-width:78ch}
+  @media (max-width:560px){ .tile .v{font-size:18px} }
+
+  /* --- impresión: el PDF sale de aquí ------------------------------------ */
+  @media print{
+    /* El PDF hereda el tema del sistema; sin esto sale blanco sobre blanco. */
+    :root, :root[data-theme="dark"]{
+      --ground:#ffffff; --surface:#ffffff; --surface-2:#f4f7f8;
+      --ink:#14232c; --body:#2c3d47; --muted:#5f7681;
+      --line:#c9d6dc; --line-soft:#e2eaee;
+      --accent:#0d6a71; --accent-soft:#e2f0f1;
+      --warn:#8c4019; --warn-soft:#f7e9e1;
+      --plum:#544472; --plum-soft:#ebe6f2;
+      --ok:#2c6a48; --ok-soft:#e2f0e8;
+    }
+    @page{ size:A4; margin:14mm 12mm; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.45; }
+    .wrap{ max-width:none; padding:0; gap:20px; }
+    h1{ font-size:24pt; }
+    .tile .v{ font-size:14pt; }
+    /* Sin scroll horizontal en papel: la tabla se imprime entera. */
+    .scroller{ overflow:visible; border:none; }
+    table{ min-width:0; font-size:8.6pt; }
+    thead th{ position:static; }
+    thead{ display:table-header-group; }   /* repite el encabezado en cada página */
+    tr{ break-inside:avoid; page-break-inside:avoid; }
+    tr.yr{ break-before:auto; }
+    tbody td{ padding:5px 7px; }
+    .desc{ min-width:0; }
+    .obs{ min-width:0; }
+    .analysis{ break-inside:avoid; page-break-inside:avoid; }
+    section{ break-inside:auto; }
+    footer{ break-inside:avoid; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="eyebrow">Tesorería Los Cántaros · Informe por casa</div>
+    <h1>Casa 3 — María Francisca Espinoza Westermeyer<small>Pagos recibidos entre enero 2024 – agosto 2026</small></h1>
+    <div class="head-meta">
+      <div>Fuente: <b>Cartola Mensual Gastos Comunes 2024, 2025 y 2026</b></div>
+      <div>Emitido: <b>06-10-2026</b></div>
+      <div>Movimientos: <b>29</b></div>
+    </div>
+  </header>
+
+  
+  <section class="tiles">
+    <div class="tile"><div class="k">Total recibido</div><div class="v">$5.242.072</div><div class="n">29 abonos, sin cargos</div></div>
+    <div class="tile"><div class="k">Cuotas G.C.</div><div class="v">$5.220.072</div><div class="n">27 abonos</div></div>
+    <div class="tile"><div class="k">TAG</div><div class="v">$22.000</div><div class="n">2 compras</div></div>
+    <div class="tile"><div class="k">Último mes pagado</div><div class="v">07/2026</div><div class="n">abonado el 31-08-2026</div></div>
+    <div class="tile flag"><div class="k">Por cobrar al corte</div><div class="v">$200.000</div><div class="n">agosto 2026 (1 mes)</div></div>
+  </section>
+
+  <section>
+    <h2>Detalle de movimientos</h2>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Descripción</th><th style="text-align:right">Cargo</th>
+            <th style="text-align:right">Abono</th><th style="text-align:center">Casa</th><th>Observación</th>
+          </tr>
+        </thead>
+        <tbody><tr class="yr"><td colspan="6">2026 <span class="sub">Cuotas $1.600.015 &nbsp;·&nbsp; 8 abonos</span></td></tr>
+<tr><td class="date">06-01-2026</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 12/2025</td></tr>
+<tr><td class="date">06-02-2026</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 01/2026</td></tr>
+<tr><td class="date">03-03-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.000</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 02/2026</td></tr>
+<tr><td class="date">01-04-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.000</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 03/2026</td></tr>
+<tr><td class="date">15-05-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.000</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 04/2026</td></tr>
+<tr><td class="date">05-06-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 05/2026</td></tr>
+<tr><td class="date">31-07-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 06/2026</td></tr>
+<tr><td class="date">31-08-2026</td><td class="desc">Transf. María Francisca Espino…<span class="acct">0155514515</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 07/2026</td></tr>
+<tr class="yr"><td colspan="6">2025 <span class="sub">Cuotas $1.600.024 &nbsp;·&nbsp; TAG $10.000 &nbsp;·&nbsp; 9 abonos</span></td></tr>
+<tr><td class="date">02-01-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 12/2024</td></tr>
+<tr><td class="date">03-02-2025</td><td class="desc">Transf. Jean Paul Jouannet<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 01/2025</td></tr>
+<tr><td class="date">04-03-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 02/2025</td></tr>
+<tr><td class="date">03-04-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 03/2025</td></tr>
+<tr><td class="date">02-05-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 04/2025</td></tr>
+<tr><td class="date">16-05-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">10.000</td><td class="casa">3</td><td class="obs"><span class="chip tag">TAG</span></td></tr>
+<tr><td class="date">02-06-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 05/2025</td></tr>
+<tr><td class="date">03-07-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 06/2025</td></tr>
+<tr><td class="date">04-08-2025</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 07/2025</td></tr>
+<tr class="yr"><td colspan="6">2024 <span class="sub">Cuotas $2.020.033 &nbsp;·&nbsp; TAG $12.000 &nbsp;·&nbsp; 12 abonos</span></td></tr>
+<tr><td class="date">03-01-2024</td><td class="desc">Transf. Jean Paul Jouannet<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 01/2024</td></tr>
+<tr><td class="date">02-02-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 02/2024</td></tr>
+<tr><td class="date">09-02-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">12.000</td><td class="casa">3</td><td class="obs"><span class="chip tag">TAG</span></td></tr>
+<tr><td class="date">01-03-2024</td><td class="desc">Transf. Jean Paul Jouannet<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 03/2024</td></tr>
+<tr><td class="date">02-04-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 04/2024</td></tr>
+<tr><td class="date">31-05-2024</td><td class="desc">Transf. Jean Paul Jouannet<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 05/2024</td></tr>
+<tr><td class="date">01-07-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">170.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 06/2024</td></tr>
+<tr><td class="date">05-08-2024</td><td class="desc">Transf. Jean Paul Jouannet<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 07/2024</td></tr>
+<tr><td class="date">03-09-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 08/2024</td></tr>
+<tr><td class="date">02-10-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 09/2024</td></tr>
+<tr><td class="date">04-11-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 10/2024</td></tr>
+<tr><td class="date">06-12-2024</td><td class="desc">Transf. Jean Paul Jouannet Bayo<span class="acct">0153657858</span></td><td class="nil">—</td><td class="num">200.003</td><td class="casa">3</td><td class="obs"><span class="chip cuota">Cuota</span>Paga 11/2024</td></tr></tbody>
+        <tfoot>
+          <tr><td colspan="3">Total abonado</td><td class="num">5.242.072</td><td colspan="2"></td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="fn"><b>Notas al pie.</b> (1) <b>Depósito sin casa asignada:</b> el 08-09-2025 hay un abono de $200.003 desde la misma cuenta pagadora (0153657858, Jean Paul Jouannet Bayo) que en la cartola figura sin número de casa y clasificado como movimiento «Personal». No está sumado en este informe; por monto (termina en 03) y cuenta calza con la cuota de agosto 2025. Pendiente de confirmación por la Tesorería. (2) <b>Cartola 2025 incompleta:</b> la planilla 2025 disponible termina el 15-09-2025; no hay movimientos del 16-09 al 31-12-2025. Los pagos de septiembre, octubre y noviembre 2025 no pudieron verificarse (el abono del 06-01-2026 se imputa a diciembre 2025, lo que supone que esos meses estaban pagados). (3) Desde marzo 2026 el pago llega desde otra cuenta (0155514515, María Francisca Espino…); la casa sigue siendo la 3. (4) Los abonos de $12.000 (2024) y $10.000 (2025) corresponden a TAG y no avanzan el conteo de meses. Las fechas de la casa 3 no presentan desórdenes en la secuencia de la cartola. Corte de datos: 07-09-2026.</p>
+  </section>
+
+  <section>
+    <h2>Retrasos y anticipos</h2>
+    <div class="analysis">
+      <p><strong>Ritmo de pago.</strong> La casa paga una cuota por mes, sin saltarse ninguno entre enero de 2024 y agosto de 2025, y casi siempre en los primeros días del mes siguiente al devengado (el ritmo sano de la comunidad). Entre enero y mayo de 2024 pagaba el mes en curso; desde junio de 2024 pasó a pagar mes vencido, sin dejar meses sin cubrir. Los montos son exactos: $170.003 hasta junio 2024 y $200.003 desde julio 2024, siguiendo el alza de cuota, y no quedan abonos parciales ni saldos a favor rodando. El sufijo «03» identifica la casa; cuando cambió la cuenta pagadora, entre marzo y mayo de 2026, el sufijo desapareció ($200.000 exactos) y volvió en junio. Compró TAG dos veces (febrero 2024 y mayo 2025). En los registros disponibles no figura pago de Asfalto para la casa 3 (puede estar en el tramo sep–dic 2025 que falta en la cartola).</p>
+      <p><strong>Quiebres y situación actual.</strong> En 2026 cambia la cuenta pagadora (de Jean Paul Jouannet Bayo a María Francisca Espino…, quien figura como encargada de la casa) y se corre la fecha de pago: abril 2026 se pagó el 15 de mayo y, sobre todo, junio y julio 2026 se pagaron el 31-07 y el 31-08, es decir, a fin de mes en vez de a comienzos. No hay meses sin cubrir, pero la casa pasó de pagar entre el día 1 y el 6 a pagar al cierre del mes siguiente, unas cuatro semanas más tarde. Con el último abono del 31-08-2026 (julio 2026), el mes de agosto quedaba por pagar al corte de la cartola (07-09-2026); si mantiene el ritmo reciente, lo pagaría a fines de septiembre. Esta cartola no incluye movimientos posteriores al 07-09-2026 ni el Estado de Gastos Comunes vigente, por lo que la deuda al día de hoy debe confirmarse con el cobro más reciente.</p>
+      <div class="verdict"><span>Al corte 07-09-2026</span> · Último mes pagado: <span>07/2026</span> · Adeuda: <span>$200.000</span> (agosto 2026; $0 si el cobro llega solo hasta julio)</div>
+    </div></section>
+
+  <footer>
+    Informe elaborado por la Tesorería de Los Cántaros a partir de las planillas “Cartola Mensual Gastos Comunes” y del Estado de Gastos Comunes vigente. Cuota mensual actual: $200.000. Los pagos de TAG y de Asfalto 2025 no avanzan el conteo de meses de gastos comunes.
+  </footer>
+
+</div>
+</html>
