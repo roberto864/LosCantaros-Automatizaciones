@@ -1,0 +1,210 @@
+<!--
+  Plantilla del Informe de pagos por casa — Tesorería Los Cántaros.
+
+  Reemplaza los marcadores {{...}} y duplica las filas de ejemplo de la tabla.
+  El bloque @media print de más abajo es lo que hace que el PDF salga bien:
+  fuerza el tema claro, suelta la tabla del contenedor con scroll y evita que
+  las filas se partan entre páginas. No lo quites.
+
+  Marcadores:
+    {{CASA}}          número de casa                    (ej. 25)
+    {{PROPIETARIO}}   nombre del encargado/responsable  (ej. Juan Ghisellini)
+    {{PERIODO}}       rango cubierto                    (ej. enero 2024 – agosto 2026)
+    {{FECHA_EMISION}} fecha de emisión dd-mm-yyyy
+    {{N_MOVS}}        cantidad de movimientos
+    {{FUENTES}}       planillas consultadas
+-->
+<title>Casa {{CASA}} · Historial de Pagos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
+<style>
+  :root{
+    --ground:#eef2f4; --surface:#ffffff; --surface-2:#f6f9fa;
+    --ink:#14232c; --body:#33454f; --muted:#68808d;
+    --line:#d3dee3; --line-soft:#e4ecef;
+    --accent:#0d6a71; --accent-soft:#dceced;
+    --warn:#94451c; --warn-soft:#f4e5da;
+    --plum:#5b4a7a; --plum-soft:#e8e3f0;
+    --ok:#2c6a48; --ok-soft:#dcece2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0d151a; --surface:#141f26; --surface-2:#18242c;
+      --ink:#e6eef1; --body:#c0d0d7; --muted:#8ba2ad;
+      --line:#26353e; --line-soft:#1d2b33;
+      --accent:#54b6b8; --accent-soft:#12333a;
+      --warn:#dd9366; --warn-soft:#332014;
+      --plum:#b3a1d4; --plum-soft:#241e33;
+      --ok:#78c39a; --ok-soft:#153025;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0d151a; --surface:#141f26; --surface-2:#18242c;
+    --ink:#e6eef1; --body:#c0d0d7; --muted:#8ba2ad;
+    --line:#26353e; --line-soft:#1d2b33;
+    --accent:#54b6b8; --accent-soft:#12333a;
+    --warn:#dd9366; --warn-soft:#332014;
+    --plum:#b3a1d4; --plum-soft:#241e33;
+    --ok:#78c39a; --ok-soft:#153025;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--body);
+    font-family:"Source Serif 4",Georgia,"Times New Roman",serif;
+    font-size:16.5px; line-height:1.62; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1000px; margin:0 auto; padding:clamp(20px,4vw,52px) clamp(16px,4vw,40px) 72px; display:flex; flex-direction:column; gap:34px}
+
+  .head{display:flex; flex-direction:column; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:22px}
+  .eyebrow{font-family:"Archivo",system-ui,sans-serif; font-weight:600; font-size:11.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--accent)}
+  h1{font-family:"Archivo",system-ui,sans-serif; font-weight:700; color:var(--ink); font-size:clamp(30px,5.2vw,46px); line-height:1.04; letter-spacing:-.022em; margin:0; text-wrap:balance}
+  h1 small{display:block; font-size:.42em; font-weight:500; letter-spacing:.01em; color:var(--muted); margin-top:10px; line-height:1.3}
+  .head-meta{display:flex; flex-wrap:wrap; gap:6px 22px; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12.5px; color:var(--muted)}
+  .head-meta b{color:var(--body); font-weight:500}
+
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:3px; overflow:hidden}
+  .tile{background:var(--surface); padding:16px 18px 18px; display:flex; flex-direction:column; gap:5px}
+  .tile .k{font-family:"Archivo",system-ui,sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--muted)}
+  .tile .v{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-size:21px; font-weight:600; color:var(--ink); letter-spacing:-.02em}
+  .tile .n{font-size:13px; color:var(--muted); line-height:1.35}
+  .tile.flag .v{color:var(--warn)}
+  .tile.good .v{color:var(--ok)}
+
+  h2{font-family:"Archivo",system-ui,sans-serif; font-weight:600; color:var(--ink); font-size:13px; letter-spacing:.13em; text-transform:uppercase; margin:0 0 14px; display:flex; align-items:center; gap:12px}
+  h2::after{content:""; flex:1; height:1px; background:var(--line)}
+
+  .scroller{overflow-x:auto; border:1px solid var(--line); border-radius:3px; background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:860px; font-size:14px}
+  thead th{position:sticky; top:0; z-index:2; background:var(--surface-2); font-family:"Archivo",system-ui,sans-serif; font-size:10.5px; font-weight:600; letter-spacing:.11em; text-transform:uppercase; color:var(--muted); text-align:left; padding:11px 14px; border-bottom:1px solid var(--line); white-space:nowrap}
+  tbody td{padding:9px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+  tbody tr:hover td{background:var(--surface-2)}
+  tr.yr td{background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:12px; letter-spacing:.16em; color:var(--ink); padding:9px 14px}
+  tr.yr .sub{float:right; font-weight:500; letter-spacing:.04em; color:var(--muted); font-size:11.5px}
+  .num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; color:var(--ink); font-weight:500}
+  .date{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; white-space:nowrap; color:var(--body)}
+  .desc{font-size:13.5px; color:var(--body); min-width:230px}
+  .desc .acct{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px; color:var(--muted); display:block}
+  .casa{font-family:"IBM Plex Mono",ui-monospace,monospace; text-align:center; color:var(--muted)}
+  .nil{color:var(--muted); text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace}
+  .obs{font-size:13.5px; min-width:220px}
+  .chip{display:inline-block; font-family:"Archivo",system-ui,sans-serif; font-size:10px; font-weight:600; letter-spacing:.09em; text-transform:uppercase; padding:2px 7px; border-radius:2px; margin-right:7px; vertical-align:1px}
+  .chip.cuota{background:var(--accent-soft); color:var(--accent)}
+  .chip.tag{background:var(--plum-soft); color:var(--plum)}
+  .chip.asf{background:var(--warn-soft); color:var(--warn)}
+  /* Aportes extraordinarios: CSO, cuota extra 2023, cámaras 2016, lo que venga. */
+  .chip.otro{background:var(--surface-2); color:var(--muted); box-shadow:inset 0 0 0 1px var(--line)}
+  tfoot td{padding:12px 14px; border-top:2px solid var(--ink); font-family:"Archivo",system-ui,sans-serif; font-weight:700; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink)}
+  tfoot td.num{font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:15px; letter-spacing:0}
+  .fn{font-size:12.5px; color:var(--muted); margin:9px 2px 0; line-height:1.5; max-width:78ch}
+  .fn b{color:var(--body); font-weight:600}
+
+  .analysis{background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:3px; padding:24px clamp(18px,3vw,30px); display:flex; flex-direction:column; gap:14px}
+  .analysis p{margin:0; max-width:66ch}
+  .analysis p strong{color:var(--ink); font-weight:600}
+  .verdict{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px; font-family:"Archivo",system-ui,sans-serif; font-size:13px; font-weight:600; color:var(--warn); background:var(--warn-soft); border-radius:3px; padding:11px 15px; letter-spacing:.01em}
+  .verdict.good{color:var(--ok); background:var(--ok-soft)}
+  .verdict span{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; font-weight:600}
+  footer{font-size:12.5px; color:var(--muted); border-top:1px solid var(--line); padding-top:16px; line-height:1.6; max-width:78ch}
+  @media (max-width:560px){ .tile .v{font-size:18px} }
+
+  /* --- impresión: el PDF sale de aquí ------------------------------------ */
+  @media print{
+    /* El PDF hereda el tema del sistema; sin esto sale blanco sobre blanco. */
+    :root, :root[data-theme="dark"]{
+      --ground:#ffffff; --surface:#ffffff; --surface-2:#f4f7f8;
+      --ink:#14232c; --body:#2c3d47; --muted:#5f7681;
+      --line:#c9d6dc; --line-soft:#e2eaee;
+      --accent:#0d6a71; --accent-soft:#e2f0f1;
+      --warn:#8c4019; --warn-soft:#f7e9e1;
+      --plum:#544472; --plum-soft:#ebe6f2;
+      --ok:#2c6a48; --ok-soft:#e2f0e8;
+    }
+    @page{ size:A4; margin:14mm 12mm; }
+    body{ background:#fff; font-size:10.5pt; line-height:1.45; }
+    .wrap{ max-width:none; padding:0; gap:20px; }
+    h1{ font-size:24pt; }
+    .tile .v{ font-size:14pt; }
+    /* Sin scroll horizontal en papel: la tabla se imprime entera. */
+    .scroller{ overflow:visible; border:none; }
+    table{ min-width:0; font-size:8.6pt; }
+    thead th{ position:static; }
+    thead{ display:table-header-group; }   /* repite el encabezado en cada página */
+    tr{ break-inside:avoid; page-break-inside:avoid; }
+    tr.yr{ break-before:auto; }
+    tbody td{ padding:5px 7px; }
+    .desc{ min-width:0; }
+    .obs{ min-width:0; }
+    .analysis{ break-inside:avoid; page-break-inside:avoid; }
+    section{ break-inside:auto; }
+    footer{ break-inside:avoid; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="head">
+    <div class="eyebrow">Tesorería Los Cántaros · Informe por casa</div>
+    <h1>Casa {{CASA}} — {{PROPIETARIO}}<small>Pagos recibidos entre {{PERIODO}}</small></h1>
+    <div class="head-meta">
+      <div>Fuente: <b>{{FUENTES}}</b></div>
+      <div>Emitido: <b>{{FECHA_EMISION}}</b></div>
+      <div>Movimientos: <b>{{N_MOVS}}</b></div>
+    </div>
+  </header>
+
+  <!-- Tarjetas de resumen. Quita las que no apliquen (si la casa no pagó
+       Asfalto, no pongas una tarjeta en $0: mejor que no aparezca).
+       Usa .flag para deuda y .good para una casa al día o adelantada. -->
+  <section class="tiles">
+    <div class="tile"><div class="k">Total recibido</div><div class="v">$0</div><div class="n">N abonos, sin cargos</div></div>
+    <div class="tile"><div class="k">Cuotas G.C.</div><div class="v">$0</div><div class="n">N abonos</div></div>
+    <div class="tile"><div class="k">Asfalto 2025</div><div class="v">$0</div><div class="n">—</div></div>
+    <div class="tile"><div class="k">TAG</div><div class="v">$0</div><div class="n">N compras</div></div>
+    <div class="tile flag"><div class="k">Deuda al {{FECHA_EMISION}}</div><div class="v">$0</div><div class="n">—</div></div>
+  </section>
+
+  <section>
+    <h2>Detalle de movimientos</h2>
+    <div class="scroller">
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th><th>Descripción</th><th style="text-align:right">Cargo</th>
+            <th style="text-align:right">Abono</th><th style="text-align:center">Casa</th><th>Observación</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="yr"><td colspan="6">2026 <span class="sub">Cuotas $0 &nbsp;·&nbsp; TAG $0</span></td></tr>
+          <tr>
+            <td class="date">01-01-2026</td>
+            <td class="desc">Transf. de Nombre Del Pagador<span class="acct">0000000000</span></td>
+            <td class="nil">—</td>
+            <td class="num">200.000</td>
+            <td class="casa">{{CASA}}</td>
+            <td class="obs"><span class="chip cuota">Cuota</span>Paga 12/2025</td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="3">Total abonado</td><td class="num">0</td><td colspan="2"></td></tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="fn">Notas al pie: incidencias encontradas en las planillas, cambios de titular de la cuenta pagadora, etc.</p>
+  </section>
+
+  <section>
+    <h2>Retrasos y anticipos</h2>
+    <div class="analysis">
+      <p>Primer párrafo: el patrón histórico de pago de la casa.</p>
+      <p>Segundo párrafo: qué cambió y en qué situación está hoy.</p>
+      <div class="verdict"><span>Al {{FECHA_EMISION}}</span> · Último mes pagado: <span>MM/AAAA</span> · Adeuda: <span>$0</span></div>
+    </div>
+  </section>
+
+  <footer>
+    Informe elaborado por la Tesorería de Los Cántaros a partir de las planillas “Cartola Mensual Gastos Comunes” y del Estado de Gastos Comunes vigente. Cuota mensual actual: $200.000. Los pagos de TAG y de Asfalto 2025 no avanzan el conteo de meses de gastos comunes.
+  </footer>
+
+</div>
